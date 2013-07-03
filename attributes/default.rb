@@ -19,8 +19,10 @@
 #
 case node['platform_family']
 when "rhel"
+  apache_user  = "apache"
   apache_group = "apache"
 when "debian"
+  apache_user  = "www-data"
   apache_group = "www-data"
 end
 
@@ -34,8 +36,10 @@ default['drupal']['site']['pass'] = "drupaladmin"
 default['drupal']['site']['name'] = "Drupal7"
 default['drupal']['site']['host'] = "localhost"
 default['drupal']['apache']['port'] = "80"
+default['drupal']['apache']['user'] = node['apache']['user'] rescue apache_user
 default['drupal']['apache']['group'] = node['apache']['group'] rescue apache_group
 default['drupal']['system']['user'] = "drupal"
+default['drupal']['system']['group'] = "drupal"
 default['drupal']['system']['pass_hash'] = nil
 default['drupal']['system']['home'] = node['drupal']['dir']
 

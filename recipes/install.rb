@@ -48,6 +48,7 @@ end
 execute "install-drupal" do
   cwd  File.dirname(node['drupal']['dir'])
   user node['drupal']['system']['user']
+  group node['drupal']['system']['group']
   command "#{node['drupal']['drush']['dir']}/drush -y site-install -r #{node['drupal']['dir']} --account-name=#{node['drupal']['site']['admin']} --account-pass='#{node['drupal']['site']['pass']}' --site-name=\"#{node['drupal']['site']['name']}\" \
   --db-url=mysql://#{node['drupal']['db']['user']}:'#{node['drupal']['db']['password']}'@#{node['drupal']['db']['host']}/#{node['drupal']['db']['database']} #{node['drupal']['drush']['options']}"
   creates "#{node['drupal']['dir']}/sites/default/settings.php"
@@ -61,14 +62,10 @@ else
 end
 
 directory "#{node['drupal']['dir']}/sites/default/files" do
-  group node['drupal']['apache']['group']
+  user node['drupal']['system']['user']
+  group node['drupal']['system']['group']
   mode "2775"
   action :create
-end
-
-execute "fixup #{node['drupal']['dir']} group recursively" do
-  command "chgrp -Rf #{node['drupal']['apache']['group']} #{node['drupal']['dir']}"
-  only_if { Etc.getgrgid(File.stat(node['drupal']['dir']).gid).name != node['drupal']['apache']['group'] }
 end
 
 if node['drupal']['modules']

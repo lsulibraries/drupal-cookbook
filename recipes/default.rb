@@ -45,16 +45,23 @@ user node['drupal']['system']['user'] do
   password node['drupal']['system']['pass_hash']
 end
 
+group node['drupal']['system']['group'] do
+  action :modify
+  members node['drupal']['apache']['user']
+  append true
+end
+
 directory File.dirname(node['drupal']['dir']) do
   owner node['drupal']['system']['user']
-  group node['drupal']['system']['user']
-  mode 00755
+  group node['drupal']['system']['group']
+  mode 00750
   recursive true
 end
 
 execute "download-drupal" do
   cwd  File.dirname(node['drupal']['dir'])
   user node['drupal']['system']['user']
+  group node['drupal']['system']['group']
   command "#{node['drupal']['drush']['dir']}/drush -y dl drupal-#{node['drupal']['version']} --destination=#{File.dirname(node['drupal']['dir'])} --drupal-project-rename=#{File.basename(node['drupal']['dir'])}"
   not_if "#{node['drupal']['drush']['dir']}/drush -r #{node['drupal']['dir']} status | grep #{node['drupal']['version']}"
   retries 3

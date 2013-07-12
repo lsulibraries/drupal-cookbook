@@ -1,44 +1,41 @@
-require 'berkshelf/vagrant'
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
-Vagrant::Config.run do |config|
-  config.vm.host_name = "drupal-berkshelf"
-
-  config.vm.box = "opscode-ubuntu-12.04"
-  config.vm.box_url = "https://opscode-vm.s3.amazonaws.com/vagrant/boxes/opscode-ubuntu-12.04.box"
-
-  config.vm.customize ["modifyvm", :id, "--memory", "512"]
-
-  config.vm.network :hostonly, "33.33.33.11"
-
-  config.vm.forward_port 80, 8080
-  config.vm.share_folder("v-root", "/vagrant", ".")
-
-  config.vm.provision :shell, :inline => "sudo aptitude update"
-
+Vagrant.configure("2") do |config|
+  config.vm.hostname = "drupal-berkshelf"
+  config.vm.box = "vagrant-ubuntu-12.04"
+  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  config.vm.network :private_network, ip: "33.33.33.11"
+  config.vm.network :forwarded_port, guest: 80, host: 8080
   config.ssh.max_tries = 40
   config.ssh.timeout   = 120
+  config.berkshelf.enabled = true
+  config.omnibus.chef_version = :latest
 
   config.vm.provision :chef_solo do |chef|
+    chef.log_level = :debug
+    chef.data_bags_path = "test/integration/data_bags"
+    chef.encrypted_data_bag_secret_key_path = "test/integration/encrypted_data_bag_secret"
     chef.json = {
-     :www_root => '/vagrant/public',
      :mysql => {
-        :server_root_password => "rootpass",
-        :server_repl_password => "replpass",
-        :server_debian_password => "debpass"
+        :server_root_password => "root&pass",
+        :server_repl_password => "repl&pass",
+        :server_debian_password => "deb&pass"
      },
      :drupal => {
         :db => {
           :password => "drupalpass"
-        },
-        :dir => "/vagrant/mysite"
+        }
       },
-      :hosts => {
-        :localhost_aliases => ["drupal.vbox.local", "dev-site.vbox.local"]
-      }  
+     :drush => {
+       :options => "-v"
+      }
     }
 
     chef.run_list = [
-      "recipe[drupal::default]"
+      "recipe[apt]",
+      "recipe[drupal::install]",
+      "recipe[drupal::lsyncd]"
     ]
   end
 end

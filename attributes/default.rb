@@ -41,7 +41,7 @@ default['drupal']['apache']['group'] = node['apache']['group'] rescue apache_gro
 default['drupal']['system']['user'] = "drupal"
 default['drupal']['system']['group'] = "drupal"
 default['drupal']['system']['pass_hash'] = nil
-default['drupal']['system']['home'] = node['drupal']['dir']
+default['drupal']['system']['home'] = File.dirname(node['drupal']['dir'])
 
 ::Chef::Node.send(:include, Opscode::OpenSSL::Password)
 

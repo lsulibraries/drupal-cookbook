@@ -1,8 +1,8 @@
 settings = {
-   logfile    = "<%= File.dirname(node['drupal']['dir']) %>/lsyncd.log",
-   statusFile = "<%= File.dirname(node['drupal']['dir']) %>/lsyncd-status.log",
+   logfile    = "<%= node['drupal']['system']['home'] %>/lsyncd.log",
+   statusFile = "<%= node['drupal']['system']['home'] %>/lsyncd-status.log",
    statusInterval = 5,
-   pidfile = "<%= File.dirname(node['drupal']['dir']) %>/lsyncd.pid"
+   pidfile = "<%= node['drupal']['system']['home'] %>/lsyncd.pid"
 }
 
 <% [*node['drupal']['lsyncd']['slaves']].each do |ip_addr| %>

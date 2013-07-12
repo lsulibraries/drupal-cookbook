@@ -40,7 +40,7 @@ else
 end
 
 user node['drupal']['system']['user'] do
-  home node['drupal']['dir']
+  home node['drupal']['system']['home']
   shell "/bin/bash"
   password node['drupal']['system']['pass_hash']
 end
@@ -51,7 +51,7 @@ group node['drupal']['system']['group'] do
   append true
 end
 
-directory File.dirname(node['drupal']['dir']) do
+directory node['drupal']['system']['home'] do
   owner node['drupal']['system']['user']
   group node['drupal']['system']['group']
   mode 00750

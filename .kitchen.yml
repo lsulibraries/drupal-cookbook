@@ -42,3 +42,16 @@ suites:
       server_root_password: root&pass
       server_debian_password: deb&pass
       server_repl_password: repl&pass
+- name: lsyncd
+  run_list:
+  - recipe[drupal::install]
+  - recipe[drupal::lsyncd]
+  encrypted_data_bag_secret_key_path: "test/integration/encrypted_data_bag_secret"
+  attributes:
+    drupal:
+      drush:
+        options: '-v'
+    mysql:
+      server_root_password: root&pass
+      server_debian_password: deb&pass
+      server_repl_password: repl&pass
